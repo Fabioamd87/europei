@@ -5,28 +5,25 @@ from europei import read_group
 import os.path
 import configparser
 
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
+
 group_a = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-a/classifiche.html"
 group_b = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-b/classifiche.html"
 group_c = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-c/classifiche.html"
 group_d = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-d/classifiche.html"
 
 class Ui_Manager():
-    def __init__(self,ui):
-        self.ui = ui
-        self.connect()
+    def __init__(self):
+        self.MainWindow = QtGui.QMainWindow()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self.MainWindow)
+        self.MainWindow.show()
         fetch_data()
+        self.connect()
         self.populate()
-
-    def add_horizontal_layout_to_vertical(self,h,filename):
-        """know for every group the respective QVboxLayout"""
-        if filename == 'A.ini':
-            self.ui.verticalLayout_1.addLayout(h)
-        if filename == 'B.ini':
-            self.ui.verticalLayout_2.addLayout(h)
-        if filename == 'C.ini':
-            self.ui.verticalLayout_3.addLayout(h)
-        if filename == 'D.ini':
-            self.ui.verticalLayout_4.addLayout(h)
 
     def get_vertical_layout(self,filename):
         """know for every group the respective QVboxLayout"""
@@ -62,7 +59,8 @@ class Ui_Manager():
         h.addWidget(w)
         w = QtGui.QLabel('+/-')
         h.addWidget(w)
-        self.add_horizontal_layout_to_vertical(h,f)
+        v = self.get_vertical_layout(f)
+        v.addLayout(h)
 
     def populate(self):
 
@@ -78,37 +76,37 @@ class Ui_Manager():
                 h= QtGui.QHBoxLayout()
                 w = QtGui.QLabel(t)
                 h.addWidget(w)
-                for i in parser.items(t):
-                    w = QtGui.QLabel(i[1])
+                for s in stats:
+                    w = QtGui.QLabel(s[1])
                     h.addWidget(w)
-                self.add_horizontal_layout_to_vertical(h,f)
+                v = self.get_vertical_layout(f)
+                v.addLayout(h)
 
-    def update_ui(self):
-
+    def update(self):
+        self.ui.setupUi(self.MainWindow)
+        self.populate()
+        """
         filenames = ['A.ini','B.ini','C.ini','D.ini']
 
         for f in filenames:
             parser = configparser.SafeConfigParser()
             parser.read(f)
             teams = parser.sections()
-            vbl = self.get_vertical_layout(f)
-            hbl = vbl.children()
-            for h in hbl[1:]:
-                print(h)
-            for t in teams:
+            v = self.get_vertical_layout(f)
+            hboxes = v.children()
+            for t, h in teams, hboxes[1:]:
                 stats = parser.items(t)
-                for i in parser.items(t):
-                    w = QtGui.QLabel(i[1])
-                    h.addWidget(w)
-                self.add_horizontal_layout_to_vertical(h,f)
-
+                ws = h.children()
+                for s, w in stats, ws:
+                    print(s)
+                    print(w.getText())
+        """
     def call_update(self):
         update_data()
-        self.update_ui()
+        self.update()
 
     def connect(self):
-        pass
-        #self.ui.actionAggiorna.connect(ui.actionAggiorna, SIGNAL('triggered()'), self.call_update)
+        self.ui.actionAggiorna.connect(self.ui.actionAggiorna, SIGNAL('triggered()'), self.call_update)
 
 def create_config(filename, url):
 
@@ -156,17 +154,10 @@ def update_data():
     create_config('C', group_c)
     create_config('D', group_d)
 
-    #dovrebbe ricancellare tutti i widget e ricrearli
-
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    um = Ui_Manager(ui)
-    #fetch_data()
+    um = Ui_Manager()
     #populate(ui)
     #connect(ui)
     sys.exit(app.exec_())
