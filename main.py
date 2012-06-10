@@ -41,6 +41,8 @@ class Ui_Manager():
         h= QtGui.QHBoxLayout()
         w = QtGui.QLabel('Squadra')
         h.addWidget(w)
+        w = QtGui.QLabel()
+        h.addWidget(w)
         w = QtGui.QLabel('Pos.')
         h.addWidget(w)
         w = QtGui.QLabel('P.ti')
@@ -76,31 +78,25 @@ class Ui_Manager():
                 h= QtGui.QHBoxLayout()
                 w = QtGui.QLabel(t)
                 h.addWidget(w)
+                image = QtGui.QLabel()
+                imagepath = self.get_flag(t)
+                print(imagepath)
+                image.setPixmap(QtGui.QPixmap(_fromUtf8(imagepath)))
+                h.addWidget(image)
                 for s in stats:
                     w = QtGui.QLabel(s[1])
                     h.addWidget(w)
                 v = self.get_vertical_layout(f)
                 v.addLayout(h)
 
+    def get_flag(self,t):
+        return('flags/'+t+'.gif')
+
     def update(self):
+        #controlla prima la connessione
         self.ui.setupUi(self.MainWindow)
         self.populate()
-        """
-        filenames = ['A.ini','B.ini','C.ini','D.ini']
 
-        for f in filenames:
-            parser = configparser.SafeConfigParser()
-            parser.read(f)
-            teams = parser.sections()
-            v = self.get_vertical_layout(f)
-            hboxes = v.children()
-            for t, h in teams, hboxes[1:]:
-                stats = parser.items(t)
-                ws = h.children()
-                for s, w in stats, ws:
-                    print(s)
-                    print(w.getText())
-        """
     def call_update(self):
         update_data()
         self.update()
