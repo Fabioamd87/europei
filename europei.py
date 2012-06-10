@@ -1,7 +1,7 @@
 import urllib.request
-from sgmllib import SGMLParser
+from html.parser import HTMLParser
 
-class TableParser(SGMLParser):
+class TableParser(HTMLParser):
 
     def reset(self):                       
         # extend (called by SGMLParser.__init__)
@@ -9,14 +9,15 @@ class TableParser(SGMLParser):
         print('declaring initial data')
         self.inside_table_element = False
         self.data = []
-        SGMLParser.reset(self)
+        HTMLParser.reset(self)
         
-    def start_table(self, attrs):
-        tableclass = [v for k, v in attrs if k=='class']
-        if tableclass:
-            tableclass = tableclass[0]
-            if tableclass == 'football':
-                self.inside_table_element = True
+    def handle_starttag(self, tag, attrs):
+        if tag == 'table':
+            tableclass = [v for k, v in attrs if k=='class']
+            if tableclass:
+                tableclass = tableclass[0]
+                if tableclass == 'football':
+                    self.inside_table_element = True
 
     def end_table(self):
         if self.inside_table_element:
@@ -33,7 +34,7 @@ class TableParser(SGMLParser):
 
 def read_group(url):
     sock = urllib.request.urlopen(url)
-    parser = TableParser()
+    parser = TableParser(strict=False)
     parser.feed(str(sock.read()))
     sock.close()
     parser.close()
