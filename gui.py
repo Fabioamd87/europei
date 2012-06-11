@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'europei2.ui'
+# Form implementation generated from reading ui file 'europei.ui'
 #
-# Created: Fri Jun  8 15:12:14 2012
+# Created: Mon Jun 11 16:09:20 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -78,7 +78,10 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.actionAggiorna = QtGui.QAction(MainWindow)
         self.actionAggiorna.setObjectName(_fromUtf8("actionAggiorna"))
+        self.actionEsci = QtGui.QAction(MainWindow)
+        self.actionEsci.setObjectName(_fromUtf8("actionEsci"))
         self.menuMenu.addAction(self.actionAggiorna)
+        self.menuMenu.addAction(self.actionEsci)
         self.menubar.addAction(self.menuMenu.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -93,14 +96,5 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QtGui.QApplication.translate("MainWindow", "Gruppo D", None, QtGui.QApplication.UnicodeUTF8))
         self.menuMenu.setTitle(QtGui.QApplication.translate("MainWindow", "Menu", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAggiorna.setText(QtGui.QApplication.translate("MainWindow", "Aggiorna", None, QtGui.QApplication.UnicodeUTF8))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+        self.actionEsci.setText(QtGui.QApplication.translate("MainWindow", "Esci", None, QtGui.QApplication.UnicodeUTF8))
 

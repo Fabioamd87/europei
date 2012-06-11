@@ -15,12 +15,43 @@ group_b = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-b/classifiche.h
 group_c = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-c/classifiche.html"
 group_d = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-d/classifiche.html"
 
+#systray.showMessage('QtNotes', 'Application minimized')
+
+class MainGUI(QtGui.QMainWindow):
+    def __init__(self):
+        QtGui.QMainWindow.__init__(self)
+    
+    def closeEvent(self,  ev):
+        self.hide()
+        ev.ignore()
+
+    def ShowWindow(self):
+        self.show()
+
+class TrayIcon(QtGui.QSystemTrayIcon):
+    
+    def __init__(self):
+        QtGui.QSystemTrayIcon.__init__(self)
+
+    def clicked(self):
+        self.activated(QtGui.QSystemTrayIcon.Trigger)
+
 class Ui_Manager():
     def __init__(self):
-        self.MainWindow = QtGui.QMainWindow()
+        self.MainWindow = MainGUI()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
         self.MainWindow.show()
+        
+        trayicon = QtGui.QIcon('tray.png')
+        self.tray = TrayIcon()
+        self.tray.setIcon(trayicon)
+        self.tray.setParent(self.MainWindow)
+        self.tray.setContextMenu(self.ui.menuMenu)
+        #QtCore.QObject.connect(quitAction,  QtCore.SIGNAL("triggered()"), ui.QuitApp)
+        #QtCore.QObject.connect(showAction,  QtCore.SIGNAL("triggered()"), window.ShowWindow)
+        self.tray.show()
+        
         fetch_data()
         self.connect()
         self.populate()
@@ -76,11 +107,13 @@ class Ui_Manager():
             for t in teams:
                 stats = parser.items(t)
                 h= QtGui.QHBoxLayout()
-                w = QtGui.QLabel(t)
+                if t == 'Repubblica Ceca':
+                    w = QtGui.QLabel('Rep. Ceca')
+                else:
+                    w = QtGui.QLabel(t)
                 h.addWidget(w)
                 image = QtGui.QLabel()
                 imagepath = self.get_flag(t)
-                print(imagepath)
                 image.setPixmap(QtGui.QPixmap(_fromUtf8(imagepath)))
                 h.addWidget(image)
                 for s in stats:
@@ -103,6 +136,16 @@ class Ui_Manager():
 
     def connect(self):
         self.ui.actionAggiorna.connect(self.ui.actionAggiorna, SIGNAL('triggered()'), self.call_update)
+        self.ui.actionEsci.connect(self.ui.actionEsci, SIGNAL('triggered()'), QtGui.qApp.quit)
+        self.tray.connect(self.tray,  SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.test)
+
+    def test(self,r):
+        if r == 3:
+            if self.MainWindow.isActiveWindow():
+                self.MainWindow.hide()
+            else:                 
+                self.MainWindow.show()
+        
 
 def create_config(filename, url):
 
@@ -154,8 +197,6 @@ if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
     um = Ui_Manager()
-    #populate(ui)
-    #connect(ui)
     sys.exit(app.exec_())
 
 
