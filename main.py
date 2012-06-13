@@ -148,6 +148,7 @@ class Ui_Manager():
         
 
 def create_config(filename, url):
+    """creates a file with data for each group fetched from an url"""
 
     G = read_group(url)
     parser = configparser.SafeConfigParser()
@@ -162,15 +163,15 @@ def create_config(filename, url):
 
     parser.set(G[2][1], G[0][0], G[2][0])
     for i in range(2,10):
-        parser.set(G[2][1], G[0][i], G[1][i])
+        parser.set(G[2][1], G[0][i], G[2][i])
 
     parser.set(G[3][1], G[0][0], G[3][0])
     for i in range(2,10):
-        parser.set(G[3][1], G[0][i], G[1][i])
+        parser.set(G[3][1], G[0][i], G[3][i])
 
     parser.set(G[4][1], G[0][0], G[4][0])
     for i in range(2,10):
-        parser.set(G[4][1], G[0][i], G[1][i])
+        parser.set(G[4][1], G[0][i], G[4][i])
 
     f = open(filename+'.ini', 'w')
     parser.write(f)

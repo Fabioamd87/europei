@@ -19,8 +19,8 @@ class TableParser(HTMLParser):
                 if tableclass == 'football':
                     self.inside_table_element = True
 
-    def end_table(self):
-        if self.inside_table_element:
+    def handle_endtag(self, tag):
+        if tag == 'table' and self.inside_table_element:
             self.inside_table_element = False
                 
 
@@ -49,4 +49,5 @@ def read_group(url):
             i=0
             tab.append(t)
             t=[]
+    print(tab)
     return tab
