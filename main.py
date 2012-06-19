@@ -1,7 +1,7 @@
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QObject, SIGNAL, pyqtSignal
 from gui import Ui_MainWindow
-from europei import read_group
+from europei import read_group, read_results
 import os.path
 import configparser
 
@@ -14,6 +14,7 @@ group_a = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-a/classifiche.h
 group_b = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-b/classifiche.html"
 group_c = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-c/classifiche.html"
 group_d = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-d/classifiche.html"
+results = "http://it.eurosport.yahoo.com/calcio/europei/calendario-risultati/"
 
 #systray.showMessage('QtNotes', 'Application minimized')
 
@@ -74,8 +75,8 @@ class Ui_Manager():
         h.addWidget(w)
         w = QtGui.QLabel()
         h.addWidget(w)
-        w = QtGui.QLabel('Pos.')
-        h.addWidget(w)
+        #w = QtGui.QLabel('Pos.')
+        #h.addWidget(w)
         w = QtGui.QLabel('P.ti')
         h.addWidget(w)
         w = QtGui.QLabel('G')
@@ -98,7 +99,7 @@ class Ui_Manager():
     def populate(self):
 
         filenames = ['A.ini','B.ini','C.ini','D.ini']
-
+        
         for f in filenames:
             self.add_titles(f)
             parser = configparser.SafeConfigParser()
@@ -116,11 +117,39 @@ class Ui_Manager():
                 imagepath = self.get_flag(t)
                 image.setPixmap(QtGui.QPixmap(_fromUtf8(imagepath)))
                 h.addWidget(image)
+                #remove the position of the team
+                stats.pop(2)
                 for s in stats:
                     w = QtGui.QLabel(s[1])
                     h.addWidget(w)
-                v = self.get_vertical_layout(f)
+                v = self.get_vertical_layout(f) #get the vertical layout of the tab group
                 v.addLayout(h)
+            #adding results
+            h= QtGui.QHBoxLayout()
+            w = QtGui.QLabel('Risultati Partite')
+            h.addWidget(w)
+            v.addLayout(h)
+            #reset the parser ps: better way?
+            parser = configparser.SafeConfigParser()
+            parser.read('results.ini')
+            sections = parser.sections()
+            for s in sections:
+                #control if a metch belong to that group                
+                if parser.get(s,'gruppo') == f[0]: #the first letter of the file (the group)
+                    #DEBUG print(parser.items(s))
+                    items = parser.items(s)
+                    h= QtGui.QHBoxLayout()
+                    #remove the gruop information
+                    items.pop(1)
+                    for i in items:
+                        value = i[1]
+                        #the only exception for the long name lenght
+                        #if value == 'Repubblica Ceca':
+                        #    value = 'Rep Ceca'
+                        w = QtGui.QLabel(value)
+                        h.addWidget(w)                        
+                    v.addLayout(h)
+                    
 
     def get_flag(self,t):
         return('flags/'+t+'.gif')
@@ -147,8 +176,9 @@ class Ui_Manager():
                 self.MainWindow.show()
         
 
-def create_config(filename, url):
-    """creates a file with data for each group fetched from an url"""
+def create_group_datafile(filename, url):
+    """creates a file with data for each group fetched from an url
+        G is the group each row contain info about a team"""
 
     G = read_group(url)
     parser = configparser.SafeConfigParser()
@@ -171,28 +201,50 @@ def create_config(filename, url):
 
     parser.set(G[4][1], G[0][0], G[4][0])
     for i in range(2,10):
-        parser.set(G[4][1], G[0][i], G[4][i])
+        parser.set(G[4][1], G[0][i], G[4][i])  
 
     f = open(filename+'.ini', 'w')
     parser.write(f)
     f.close()
-    
+
+def create_results_datafile():
+    R = read_results(results)
+    parser = configparser.SafeConfigParser()
+
+    campi = ['data','gruppo','squadra1','risultato','squadra2','stadio']
+
+    for r in R:
+        primary_key=r[0]+' '+r[5] #a sort of primary key, date+stadium
+        parser.add_section(primary_key)
+        for c in r:
+            #inserisce il valore c, nel campo avente lo stesso indice (di c)
+            parser.set(primary_key, campi[r.index(c)], c)
+
+    f = open('results.ini', 'w')
+    parser.write(f)
+    f.close()
+
 def fetch_data():
+
+    if not os.path.exists("results.ini"):
+        create_results_datafile()
     if not os.path.exists("A.ini"):
-        create_config('A', group_a)
+        create_group_datafile('A', group_a)
     if not os.path.exists("B.ini"):
-        create_config('B', group_b)
+        create_group_datafile('B', group_b)
     if not os.path.exists("C.ini"):
-        create_config('C', group_c)
+        create_group_datafile('C', group_c)
     if not os.path.exists("D.ini"):
-        create_config('D', group_d)
+        create_group_datafile('D', group_d)
 
 def update_data():
     print('updating data...')
-    create_config('A', group_a)
-    create_config('B', group_b)
-    create_config('C', group_c)
-    create_config('D', group_d)
+    create_results_datafile()
+    create_group_datafile('A', group_a)
+    create_group_datafile('B', group_b)
+    create_group_datafile('C', group_c)
+    create_group_datafile('D', group_d)
+    print('Finish')
 
 if __name__ == "__main__":
     import sys
