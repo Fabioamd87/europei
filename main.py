@@ -2,7 +2,7 @@ from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QObject, SIGNAL, pyqtSignal
 from gui import Ui_MainWindow
 from europei import read_group, read_results
-import os.path
+import os, os.path
 import configparser
 
 try:
@@ -15,6 +15,12 @@ group_b = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-b/classifiche.h
 group_c = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-c/classifiche.html"
 group_d = "http://it.eurosport.yahoo.com/calcio/euro-2012/gruppo-d/classifiche.html"
 results = "http://it.eurosport.yahoo.com/calcio/europei/calendario-risultati/"
+
+flags = os.listdir('flags')
+TEAMS = []
+for f in flags:
+    f = f.strip('.gif')
+    TEAMS.append(f)
 
 #systray.showMessage('QtNotes', 'Application minimized')
 
@@ -44,14 +50,14 @@ class Ui_Manager():
         self.ui.setupUi(self.MainWindow)
         self.MainWindow.show()
         
-        trayicon = QtGui.QIcon('tray.png')
-        self.tray = TrayIcon()
-        self.tray.setIcon(trayicon)
-        self.tray.setParent(self.MainWindow)
-        self.tray.setContextMenu(self.ui.menuMenu)
+        #trayicon = QtGui.QIcon('tray.png')
+        #self.tray = TrayIcon()
+        #self.tray.setIcon(trayicon)
+        #self.tray.setParent(self.MainWindow)
+        #self.tray.setContextMenu(self.ui.menuMenu)
         #QtCore.QObject.connect(quitAction,  QtCore.SIGNAL("triggered()"), ui.QuitApp)
         #QtCore.QObject.connect(showAction,  QtCore.SIGNAL("triggered()"), window.ShowWindow)
-        self.tray.show()
+        #self.tray.show()
         
         fetch_data()
         self.connect()
@@ -129,27 +135,72 @@ class Ui_Manager():
             w = QtGui.QLabel('Risultati Partite')
             h.addWidget(w)
             v.addLayout(h)
-            #reset the parser ps: better way?
-            parser = configparser.SafeConfigParser()
+            
+            parser = configparser.SafeConfigParser() #reset the parser ps: better way?
             parser.read('results.ini')
             sections = parser.sections()
+            
             for s in sections:
-                #control if a metch belong to that group                
+                #control if a metch belong to that group
                 if parser.get(s,'gruppo') == f[0]: #the first letter of the file (the group)
                     #DEBUG print(parser.items(s))
                     items = parser.items(s)
                     h= QtGui.QHBoxLayout()
-                    #remove the gruop information
-                    items.pop(1)
+                    items.pop(1) #remove the gruop information
                     for i in items:
                         value = i[1]
-                        #the only exception for the long name lenght
-                        #if value == 'Repubblica Ceca':
-                        #    value = 'Rep Ceca'
                         w = QtGui.QLabel(value)
                         h.addWidget(w)                        
                     v.addLayout(h)
-                    
+        parser = configparser.SafeConfigParser()
+        parser.read('results.ini')
+        sections = parser.sections()
+        for s in sections:
+            if parser.get(s,'gruppo') == 'QF1' or parser.get(s,'gruppo') == 'QF2' or parser.get(s,'gruppo') == 'QF3' or parser.get(s,'gruppo') == 'QF4':
+                items = parser.items(s)
+                h= QtGui.QHBoxLayout()
+                #remove the gruop information
+                items.pop(1)
+                for i in items:
+                    value = i[1]
+                    w = QtGui.QLabel(value)
+                    h.addWidget(w)
+                    if value in TEAMS:
+                        image = QtGui.QLabel()
+                        imagepath = self.get_flag(value)
+                        image.setPixmap(QtGui.QPixmap(_fromUtf8(imagepath)))
+                        h.addWidget(image)
+                self.ui.quarti_finale.addLayout(h)
+            if parser.get(s,'gruppo') == 'SF1' or parser.get(s,'gruppo') == 'SF2':
+                items = parser.items(s)
+                h= QtGui.QHBoxLayout()
+                #remove the gruop information
+                items.pop(1)
+                for i in items:
+                    value = i[1]
+                    w = QtGui.QLabel(value)
+                    h.addWidget(w)
+                    if value in TEAMS:
+                        image = QtGui.QLabel()
+                        imagepath = self.get_flag(value)
+                        image.setPixmap(QtGui.QPixmap(_fromUtf8(imagepath)))
+                        h.addWidget(image)
+                self.ui.semi_finale.addLayout(h)
+            if parser.get(s,'gruppo') == 'F':
+                items = parser.items(s)
+                h= QtGui.QHBoxLayout()
+                #remove the gruop information
+                items.pop(1)
+                for i in items:
+                    value = i[1]
+                    w = QtGui.QLabel(value)
+                    h.addWidget(w)
+                    if value in TEAMS:
+                        image = QtGui.QLabel()
+                        imagepath = self.get_flag(value)
+                        image.setPixmap(QtGui.QPixmap(_fromUtf8(imagepath)))
+                        h.addWidget(image)
+                self.ui.finale.addLayout(h)
 
     def get_flag(self,t):
         return('flags/'+t+'.gif')
@@ -166,7 +217,7 @@ class Ui_Manager():
     def connect(self):
         self.ui.actionAggiorna.connect(self.ui.actionAggiorna, SIGNAL('triggered()'), self.call_update)
         self.ui.actionEsci.connect(self.ui.actionEsci, SIGNAL('triggered()'), QtGui.qApp.quit)
-        self.tray.connect(self.tray,  SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.test)
+        #self.tray.connect(self.tray,  SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.test)
 
     def test(self,r):
         if r == 3:

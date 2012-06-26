@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'europei.ui'
 #
-# Created: Mon Jun 11 16:09:20 2012
+# Created: Tue Jun 26 11:47:58 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -68,6 +68,30 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName(_fromUtf8("verticalLayout_4"))
         self.horizontalLayout_5.addLayout(self.verticalLayout_4)
         self.tabWidget.addTab(self.tab_4, _fromUtf8(""))
+        self.tab_5 = QtGui.QWidget()
+        self.tab_5.setObjectName(_fromUtf8("tab_5"))
+        self.gridLayout = QtGui.QGridLayout(self.tab_5)
+        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.quarti_finale = QtGui.QVBoxLayout()
+        self.quarti_finale.setObjectName(_fromUtf8("quarti_finale"))
+        self.gridLayout.addLayout(self.quarti_finale, 0, 0, 1, 1)
+        self.tabWidget.addTab(self.tab_5, _fromUtf8(""))
+        self.tab_6 = QtGui.QWidget()
+        self.tab_6.setObjectName(_fromUtf8("tab_6"))
+        self.gridLayout_2 = QtGui.QGridLayout(self.tab_6)
+        self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
+        self.semi_finale = QtGui.QVBoxLayout()
+        self.semi_finale.setObjectName(_fromUtf8("semi_finale"))
+        self.gridLayout_2.addLayout(self.semi_finale, 0, 0, 1, 1)
+        self.tabWidget.addTab(self.tab_6, _fromUtf8(""))
+        self.tab_7 = QtGui.QWidget()
+        self.tab_7.setObjectName(_fromUtf8("tab_7"))
+        self.gridLayout_3 = QtGui.QGridLayout(self.tab_7)
+        self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
+        self.finale = QtGui.QVBoxLayout()
+        self.finale.setObjectName(_fromUtf8("finale"))
+        self.gridLayout_3.addLayout(self.finale, 0, 0, 1, 1)
+        self.tabWidget.addTab(self.tab_7, _fromUtf8(""))
         self.horizontalLayout.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
@@ -85,7 +109,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuMenu.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(4)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -94,6 +118,9 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("MainWindow", "Gruppo B", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QtGui.QApplication.translate("MainWindow", "Gruppo C", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QtGui.QApplication.translate("MainWindow", "Gruppo D", None, QtGui.QApplication.UnicodeUTF8))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), QtGui.QApplication.translate("MainWindow", "Quarti di Finale", None, QtGui.QApplication.UnicodeUTF8))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), QtGui.QApplication.translate("MainWindow", "Semi Finale", None, QtGui.QApplication.UnicodeUTF8))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_7), QtGui.QApplication.translate("MainWindow", "Finale", None, QtGui.QApplication.UnicodeUTF8))
         self.menuMenu.setTitle(QtGui.QApplication.translate("MainWindow", "Menu", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAggiorna.setText(QtGui.QApplication.translate("MainWindow", "Aggiorna", None, QtGui.QApplication.UnicodeUTF8))
         self.actionEsci.setText(QtGui.QApplication.translate("MainWindow", "Esci", None, QtGui.QApplication.UnicodeUTF8))

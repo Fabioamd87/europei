@@ -41,6 +41,7 @@ class TableParser(HTMLParser):
             if data != ('\\n '):
                 data = data.strip('\\n ')
                 self.data.append(data)
+        
 
 def read_results(url):
     sock = urllib.request.urlopen(url)
@@ -61,14 +62,21 @@ def read_results(url):
     i=0
     t=[]
     tab=[]
+    print(parser.data)
     for d in parser.data:
         t.append(d)
         i+=1
         if i == 6:
             i=0
             tab.append(t)
-
             t=[]
+
+    tmod = [t[0]]   
+    tmod.append('F')
+    for item in t[1:]:
+        tmod.append(item)
+    print(tmod)
+    tab.append(tmod)
     return(tab)
 
 def read_group(url):
