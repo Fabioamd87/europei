@@ -1,9 +1,6 @@
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import QObject, SIGNAL, pyqtSignal
-from gui import Ui_MainWindow
-from europei import read_group, read_results
-import os, os.path
-import configparser
+from EuropeiWindow import MainWindow
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -24,19 +21,8 @@ for f in flags:
 
 #systray.showMessage('QtNotes', 'Application minimized')
 
-class MainGUI(QtGui.QMainWindow):
-    def __init__(self):
-        QtGui.QMainWindow.__init__(self)
-    
-    def closeEvent(self,  ev):
-        self.hide()
-        ev.ignore()
-
-    def ShowWindow(self):
-        self.show()
-
 class TrayIcon(QtGui.QSystemTrayIcon):
-    
+    """creo la tray aggiungendo un segnale al click"""
     def __init__(self):
         QtGui.QSystemTrayIcon.__init__(self)
 
@@ -48,16 +34,15 @@ class Ui_Manager():
         self.MainWindow = MainGUI()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.MainWindow)
-        self.MainWindow.show()
         
-        #trayicon = QtGui.QIcon('tray.png')
-        #self.tray = TrayIcon()
-        #self.tray.setIcon(trayicon)
-        #self.tray.setParent(self.MainWindow)
-        #self.tray.setContextMenu(self.ui.menuMenu)
-        #QtCore.QObject.connect(quitAction,  QtCore.SIGNAL("triggered()"), ui.QuitApp)
-        #QtCore.QObject.connect(showAction,  QtCore.SIGNAL("triggered()"), window.ShowWindow)
-        #self.tray.show()
+        trayicon = QtGui.QIcon('tray.png')
+        self.tray = TrayIcon()
+        self.tray.setIcon(trayicon)
+        self.tray.setParent(self.MainWindow)
+        self.tray.setContextMenu(self.ui.menuMenu)
+        #QtCore.QObject.connect(self.ui.quitAction,  QtCore.SIGNAL("triggered()"), ui.QuitApp)
+        #QtCore.QObject.connect(self.ui.showAction,  QtCore.SIGNAL("triggered()"), window.ShowWindow)
+        self.tray.show()
         
         fetch_data()
         self.connect()
@@ -81,8 +66,6 @@ class Ui_Manager():
         h.addWidget(w)
         w = QtGui.QLabel()
         h.addWidget(w)
-        #w = QtGui.QLabel('Pos.')
-        #h.addWidget(w)
         w = QtGui.QLabel('P.ti')
         h.addWidget(w)
         w = QtGui.QLabel('G')
@@ -225,82 +208,12 @@ class Ui_Manager():
                 self.MainWindow.hide()
             else:                 
                 self.MainWindow.show()
-        
-
-def create_group_datafile(filename, url):
-    """creates a file with data for each group fetched from an url
-        G is the group each row contain info about a team"""
-
-    G = read_group(url)
-    parser = configparser.SafeConfigParser()
-    parser.add_section(G[1][1])
-    parser.add_section(G[2][1])
-    parser.add_section(G[3][1])
-    parser.add_section(G[4][1])
-
-    parser.set(G[1][1], G[0][0], G[1][0])
-    for i in range(2,10):
-        parser.set(G[1][1], G[0][i], G[1][i])
-
-    parser.set(G[2][1], G[0][0], G[2][0])
-    for i in range(2,10):
-        parser.set(G[2][1], G[0][i], G[2][i])
-
-    parser.set(G[3][1], G[0][0], G[3][0])
-    for i in range(2,10):
-        parser.set(G[3][1], G[0][i], G[3][i])
-
-    parser.set(G[4][1], G[0][0], G[4][0])
-    for i in range(2,10):
-        parser.set(G[4][1], G[0][i], G[4][i])  
-
-    f = open(filename+'.ini', 'w')
-    parser.write(f)
-    f.close()
-
-def create_results_datafile():
-    R = read_results(results)
-    parser = configparser.SafeConfigParser()
-
-    campi = ['data','gruppo','squadra1','risultato','squadra2','stadio']
-
-    for r in R:
-        primary_key=r[0]+' '+r[5] #a sort of primary key, date+stadium
-        parser.add_section(primary_key)
-        for c in r:
-            #inserisce il valore c, nel campo avente lo stesso indice (di c)
-            parser.set(primary_key, campi[r.index(c)], c)
-
-    f = open('results.ini', 'w')
-    parser.write(f)
-    f.close()
-
-def fetch_data():
-
-    if not os.path.exists("results.ini"):
-        create_results_datafile()
-    if not os.path.exists("A.ini"):
-        create_group_datafile('A', group_a)
-    if not os.path.exists("B.ini"):
-        create_group_datafile('B', group_b)
-    if not os.path.exists("C.ini"):
-        create_group_datafile('C', group_c)
-    if not os.path.exists("D.ini"):
-        create_group_datafile('D', group_d)
-
-def update_data():
-    print('updating data...')
-    create_results_datafile()
-    create_group_datafile('A', group_a)
-    create_group_datafile('B', group_b)
-    create_group_datafile('C', group_c)
-    create_group_datafile('D', group_d)
-    print('Finish')
 
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    um = Ui_Manager()
+    um = MainWindow()
+    um.show()
     sys.exit(app.exec_())
 
 
